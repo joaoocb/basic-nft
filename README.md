@@ -1,2 +1,2 @@
 # basic_nft
-Basic contract for a Non-Fungible Token on EOSIO
+Basic contract for a Non-Fungible Token
