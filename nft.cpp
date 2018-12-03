@@ -12,12 +12,12 @@ void example::nft::create(name issuer, symbol sym, std::string gd_json) {
     eosio_assert(sym.precision() == 0, "symbol precision must be 0");
 
     // TODO: Search for generic_data using gd_json hash
-    uint64_t gd_hash = 0;
+    uint128_t gd_hash = 0;
     // TODO: If not found, create new generic_data using gd_json
 
     tstat_table tstat_table(_self, _self.value);
     auto existing = tstat_table.find(sym.code().raw());
-    eosio_assert(existing == tdata_table.end(), "token with symbol already exists");
+    eosio_assert(existing == tstat_table.end(), "token with symbol already exists");
 
     // Create new token
     tstat_table.emplace(_self, [&](auto& ts) {
@@ -55,7 +55,7 @@ void example::nft::issue(name to, symbol sym, std::string td_json, std::vector<s
     const auto token_stat = *existing;
     require_auth(token_stat.issuer);
 
-    const auto quantity = json_data.sinze();
+    const auto quantity = json_data.size();
     const auto current_supply = token_stat.data.amount;
     eosio_assert(token_stat.data.max_amount >= current_supply + quantity, "invalid quantity");
 
@@ -65,19 +65,26 @@ void example::nft::issue(name to, symbol sym, std::string td_json, std::vector<s
     });
 
     // TODO: Search for token_data using td_json hash
-    uint64_t td_hash = 0;
+    uint128_t td_hash = 0;
     // TODO: If not found, create new token_data using td_json
 
     for(const auto data : json_data) {
-        mint(sym, data, to, td_hash);
+        mint(sym, data, token_stat.issuer, td_hash);
     }
 }
 
 void example::nft::burn(name owner, symbol sym, std::vector<uint64_t> tk_ids) {
-    require_auth(owner);
+    //require_auth(owner);
 
     tstat_table tstat_table(_self, _self.value);
-    token_table token_table(owner, sym.code().raw());
+
+    auto existing = tstat_table.find(sym.code().raw());
+    eosio_assert(existing != tstat_table.end(), "token with symbol does not exist, create token before issuing");
+
+    const auto token_stat = *existing;
+    require_auth(token_stat.issuer);
+
+    token_table token_table(token_stat.issuer, sym.code().raw());
 
     for(const auto id : tk_ids) {
         auto burn_token = token_table.find(id);
@@ -123,8 +130,9 @@ void example::nft::transfer(name from, name to, symbol sym, std::vector<uint64_t
 }
 
 void example::nft::mint(symbol sym, std::string json_data, name owner, uint64_t td_hash) {
+    print_f("mint");
     token_table token_table(owner, sym.code().raw());
-    token_table.emplace(_self, [&](auto& token) {
+    token_table.emplace(owner, [&](auto& token) {
         //TODO: Create method to get next id
         token.tk_id = 0;
         token.json_data = json_data;

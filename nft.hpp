@@ -25,35 +25,36 @@ namespace example {
 
             ACTION transfer(name from, name to, symbol sym, std::vector<uint64_t> tk_ids, std::string memo);
 
+            //class parameters
             TABLE generic_data {
-                uint64_t hash;
+                uint128_t hash;
                 bool param1;
                 bool param2;
 
                 uint64_t primary_key() const {return hash;}
             };
-
+            //object parameters
             TABLE token_data {
-                uint64_t hash;
+                uint128_t hash;
                 bool param1;
                 bool param2;
 
                 uint64_t primary_key() const {return hash;}
             };
-
+            //token kind parameters
             TABLE token_stat {
                 asset data;
                 name issuer;
-                uint64_t gd_hash;
+                uint128_t gd_hash; //generic data hash
 
                 uint64_t primary_key() const {return data.symbol.code().raw();}
             };
-
+            //individual token parameters
             TABLE token {
                 uint64_t tk_id;
                 std::string json_data;
                 name owner;
-                uint64_t td_hash;
+                uint128_t td_hash; //token data hash
 
                 uint64_t primary_key() const {return tk_id;}
             };
