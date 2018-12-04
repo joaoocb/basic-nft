@@ -26,21 +26,34 @@ namespace example {
             ACTION transfer(name from, name to, symbol sym, std::vector<uint64_t> tk_ids, std::string memo);
 
             //class parameters
-            TABLE generic_data {
+            TABLE class_parameter {
                 uint128_t hash;
-                bool param1;
-                bool param2;
+                uint64_t schema_id;
+                uint64_t record_id;
+                std::string class_data; //string is not acceptable
 
-                uint64_t primary_key() const {return hash;}
+                uint64_t primary_key() const {return record_id;}
             };
             //object parameters
-            TABLE token_data {
+            TABLE obj_parameter {
                 uint128_t hash;
-                bool param1;
-                bool param2;
+                uint64_t schema_id;
+                uint64_t record_id;
+                std::string obj_data; //string is not acceptable
 
-                uint64_t primary_key() const {return hash;}
+                uint64_t primary_key() const {return record_id;}
             };
+
+            //object parameters
+            TABLE cust_parameter {
+                uint128_t hash;
+                uint64_t schema_id;
+                uint64_t record_id;
+                std::string cust_data; //string is not acceptable
+
+                uint64_t primary_key() const {return record_id;}
+            };
+
             //token kind parameters
             TABLE token_stat {
                 asset data;
@@ -51,16 +64,17 @@ namespace example {
             };
             //individual token parameters
             TABLE token {
-                uint64_t tk_id;
-                std::string json_data;
+                uint64_t class_record_id;
+                uint64_t obj_record_id;
+                uint64_t cust_record_id;
                 name owner;
-                uint128_t td_hash; //token data hash
 
                 uint64_t primary_key() const {return tk_id;}
             };
 
-            typedef eosio::multi_index<"gdatatable"_n, generic_data> gdata_table;
-            typedef eosio::multi_index<"tdatatable"_n, token_data> tdata_table;
+            typedef eosio::multi_index<"classtable"_n, class_parameter> class_table;
+            typedef eosio::multi_index<"objtable"_n, obj_parameter> obj_table;
+            typedef eosio::multi_index<"custtable"_n, cust_parameter> cust_table;
             typedef eosio::multi_index<"tstattable"_n, token_stat> tstat_table;
             typedef eosio::multi_index<"tokentable"_n, token> token_table;
 
