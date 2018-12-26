@@ -1,2 +1,2 @@
-# basic_nft
-Basic contract for a Non-Fungible Token
+# basic-nft
+Basic contract for a Non-Fungible Token on EOS Blockchain.
